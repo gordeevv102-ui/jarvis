@@ -31,7 +31,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake build-essential libssl-dev libffi-dev libsqlite3-dev
-        pip install --upgrade pip setuptools buildozer cython
+        pip install --upgrade pip setuptools "cython<3.0.0" buildozer
 
     - name: Accept Android Licenses
       run: |
