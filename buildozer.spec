@@ -1,21 +1,40 @@
-[app]
-title = JARVIS
-package.name = jarvis
-package.domain = org.gordeev
-source.dir = .
-source.include_exts = py,png,jpg,kv,atlas
-version = 1.0
-requirements = python3,kivy,kivymd,requests,speechrecognition,urllib3,certifi,chardet,idna
-orientation = portrait
-fullscreen = 0
+name: Build Android APK
 
-[buildozer]
-log_level = 2
-warn_on_root = 1
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
-[android]
-android.permissions = INTERNET, RECORD_AUDIO, FOREGROUND_SERVICE, POST_NOTIFICATIONS
-android.api = 33
-android.minapi = 21
-android.ndk = 25b
-android.accept_sdk_license = True
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake build-essential libssl-dev libffi-dev libsqlite3-dev
+        pip install --upgrade pip setuptools buildozer cython
+
+    - name: Accept Android Licenses
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | buildozer android update || true
+
+    - name: Build with Buildozer
+      run: buildozer -v android debug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: jarvis-apk
+        path: bin/*.apk
