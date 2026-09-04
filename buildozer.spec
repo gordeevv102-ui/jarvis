@@ -1,40 +1,64 @@
-name: Build Android APK
+[app]
 
-on:
-  push:
-    branches: [ "main", "master" ]
-  workflow_dispatch:
+# (str) Title of your application
+title = Jarvis
 
-jobs:
-  build:
-    runs-on: ubuntu-22.04
+# (str) Package name
+package.name = jarvis
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+# (str) Package domain (needed for android/ios packaging)
+package.domain = org.gordeev
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+# (str) Source code where the main.py lives
+source.dir = .
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake build-essential libssl-dev libffi-dev libsqlite3-dev
-        pip install --upgrade pip setuptools buildozer cython
+# (list) Source files to include (let empty to include all the files)
+source.include_exts = py,png,jpg,kv,atlas
 
-    - name: Accept Android Licenses
-      run: |
-        mkdir -p ~/.android
-        touch ~/.android/repositories.cfg
-        yes | buildozer android update || true
+# (str) Application versioning
+version = 0.1
 
-    - name: Build with Buildozer
-      run: buildozer -v android debug
+# (list) Application requirements
+# Додайте сюди інші бібліотеки через кому, якщо використовуєте їх у main.py (наприклад: requests, urllib3)
+requirements = python3,kivy
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: jarvis-apk
-        path: bin/*.apk
+# (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
+orientation = portrait
+
+# (bool) Indicate if the application should be fullscreen or not
+fullscreen = 0
+
+# (list) Permissions
+permissions = INTERNET
+
+# (int) Target Android API, should be as high as possible.
+android.api = 33
+
+# (int) Minimum API required
+android.minapi = 21
+
+# (int) Android SDK version to use
+android.sdk = 33
+
+# (str) Android NDK version to use
+android.ndk = 25b
+
+# (bool) Use --private data storage (True) or --dir public storage (False)
+android.private_storage = True
+
+# (bool) Accept SDK licenses automatically
+android.accept_sdk_license = True
+
+# (str) The Android arch to build for
+android.archs = arm64-v8a, armeabi-v7a
+
+# (bool) enable Android auto backup feature (Build API >=23)
+android.allow_backup = True
+
+[buildozer]
+
+# (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
+log_level = 2
+
+# (int) Display warning if buildozer is run as root (0 = disable, 1 = enable)
+warn_on_root = 1
